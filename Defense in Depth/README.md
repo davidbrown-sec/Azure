@@ -20,7 +20,7 @@ I deployed a basic web application and applied multiple security layers: **Ident
 📸 *File: Screenshot 2025-09-06 at 4.51.15 PM (2).jpeg*
 
 📷 *Entra Connector settings page*  
-![Entra Settings](<[link-to-entra-settings-screenshot](https://drive.google.com/file/d/1i8CWkXDgb03-saVQFCivVxhH0Rdqji4u/view?usp=sharing)>)  
+![Entra Settings](<link-to-entra-settings-screenshot](https://drive.google.com/file/d/1i8CWkXDgb03-saVQFCivVxhH0Rdqji4u/view?usp=sharing>)  
 📸 *File: Screenshot 2025-09-06 at 4.54.43 PM (2).jpeg*
 
 ---
