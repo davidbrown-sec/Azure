@@ -20,7 +20,7 @@ I deployed a basic web application and applied multiple security layers: **Ident
 📸 *File: Screenshot 2025-09-06 at 4.51.15 PM (2).jpeg*
 
 📷 *Entra Connector settings page*  
-![Entra Settings](<https://drive.google.com/file/d/1i8CWkXDgb03-saVQFCivVxhH0Rdqji4u/view?usp=sharing>)  
+![Entra Settings](<https://github.com/davidbrown-sec/Azure/blob/8f035345462c427b9eb11817b41216fe26af1d5b/Defense%20in%20Depth/Screenshot%202025-09-06%20at%204.54.43%20PM%20(2).png>)  
 📸 *File: Screenshot 2025-09-06 at 4.54.43 PM (2).jpeg*
 
 ---
@@ -80,18 +80,6 @@ I deployed a basic web application and applied multiple security layers: **Ident
 - ✅ **Azure native tools:** App Service, Entra ID, Key Vault, Log Analytics, Sentinel.  
 - ✅ **Actionable alerts:** Automatic Sentinel incidents tied to suspicious activity.  
 
----
-
-## 🔹 Resume Bullets (Example)
-- Implemented Azure **Defense-in-Depth lab** with Identity, Perimeter, and Data layers.  
-- Integrated **Microsoft Entra ID** for authentication, **Key Vault** for secret management, and **Sentinel** for threat detection.  
-- Built monitoring rules that raised alerts on **unauthorized access attempts** and **failed logins**.  
-
----
-
-## 📷 Screenshots
-All screenshots are stored in my [Google Drive Defense in Depth folder](<link-to-your-google-drive-folder>).  
-This README embeds the most relevant ones with their file names for reference.
 
 ---
 
