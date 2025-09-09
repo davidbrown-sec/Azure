@@ -1,139 +1,103 @@
-# Defense in Depth Lab (DID-lab) – Azure
+# Defense-in-Depth (DID) Lab – Azure Web App Security
 
-This project demonstrates a **defense in depth (DiD) architecture** in Microsoft Azure by deploying and securing a web application, integrating it with **Azure Front Door, Key Vault, Entra ID (Azure AD), Log Analytics, and Microsoft Sentinel**. The lab simulates real-world SOC monitoring and security enforcement.
-
----
-
-## 📌 Lab Objectives
-- Deploy a secure Azure Web App (Python runtime).
-- Protect with **Front Door + WAF**.
-- Enforce **Access Restrictions** (IP allow/deny).
-- Centralize logging in **Log Analytics Workspace (LAW)**.
-- Enable **Sentinel detections & dashboards**.
-- Secure secrets in **Key Vault** with managed identity.
-- Monitor **Entra ID sign-ins and audit logs**.
+This project demonstrates a **Defense-in-Depth (DID)** approach using Azure services.  
+I deployed a basic web application and applied multiple security layers: **Identity**, **Perimeter**, **Secrets/Data**, and **Monitoring/Detection**.
 
 ---
 
-## 🏗️ Architecture Overview
-1. **Azure Web App** (DID-lab-WEB)  
-2. **Azure Front Door** (global entry, WAF rules)  
-3. **Key Vault** (secrets, RBAC access)  
-4. **Entra ID** (auth & SSO)  
-5. **Log Analytics Workspace** (central logs)  
-6. **Sentinel** (threat detection & response)  
+
+## 🔹 Layers Implemented
+
+### 1. Identity
+- Integrated the web app with **Microsoft Entra ID (Azure AD)** for authentication.  
+- Configured **App Service Authentication** to enforce logins.  
+- Enabled **Microsoft Entra ID Connector** in Sentinel to ingest:
+  - Sign-in Logs (tracks user logons)  
+  - Audit Logs (tracks admin changes)
+
+📷 *Example: Sentinel data connector for Entra ID*  
+![Entra Connector](<https://drive.google.com/file/d/1LYhzJODA6M4YVa1cOTkby-MviJP5InHo/view?usp=sharing>)  
+📸 *File: Screenshot 2025-09-06 at 4.51.15 PM (2).jpeg*
+
+📷 *Entra Connector settings page*  
+![Entra Settings](<[link-to-entra-settings-screenshot](https://drive.google.com/file/d/1i8CWkXDgb03-saVQFCivVxhH0Rdqji4u/view?usp=sharing)>)  
+📸 *File: Screenshot 2025-09-06 at 4.54.43 PM (2).jpeg*
 
 ---
 
-## 🚀 Deployment Steps
+### 2. Perimeter
+- Configured **App Service Access Restrictions** to only allow traffic from my trusted IP.  
+- Verified **403 Forbidden blocks** when accessing from untrusted sources (VPN).  
+- Created an **Analytics Rule** in Sentinel to detect repeated unauthorized or suspicious access attempts.
 
-### 1. Deploy Web App
-- Provisioned via Azure Portal under **DID-lab-RG**.
-- Configured with **Python 3.13** runtime.
+📷 *Blocked access page (403)*  
+![403 Block](<link-to-403-block-screenshot>)  
+📸 *File: Screenshot 2025-09-06 at 2.19.23 PM (2).jpeg*
 
-![Web App Configuration](assets/Screenshot 2025-09-06 at 1.36.51 PM (2).jpeg)
-
----
-
-### 2. Configure Networking & Access Restrictions
-- Applied **allow/deny IP rules**.
-- Verified 403 blocks for unauthorized IPs.
-
-![Networking Overview](assets/Screenshot 2025-09-06 at 1.33.38 PM (2).jpeg)  
-![Access Restrictions](assets/Screenshot 2025-09-06 at 1.49.01 PM (2).jpeg)  
-![403 Error](assets/Screenshot 2025-09-06 at 2.19.23 PM (2).jpeg)
+📷 *Sentinel Analytics Rule in Defender portal*  
+![Sentinel Rule](<link-to-sentinel-rule-screenshot>)  
+📸 *File: Screenshot 2025-09-06 at 4.32.34 PM (2).jpeg*
 
 ---
 
-### 3. Enable Diagnostics → Log Analytics
-- Sent **HTTP, Console, Application logs** to LAW.
-- Confirmed logs with KQL queries.
+### 3. Data / Secrets
+- Created an **Azure Key Vault** to store sensitive values instead of hardcoding secrets.  
+- Granted my Web App’s **Managed Identity** the `Key Vault Secrets User` role.  
+- Configured **Application Settings** in App Service to reference Key Vault secrets.  
+- Enabled **Key Vault diagnostic logs** to monitor access attempts.
 
-```kusto
-AppServiceHTTPLogs
-| summarize Hits=count() by ScStatus
-| order by Hits desc
-```
+📷 *Key Vault RBAC role assignment*  
+![Key Vault RBAC](<link-to-keyvault-rbac-screenshot>)  
+📸 *File: Screenshot 2025-09-06 at 8.22.57 AM (2).jpeg*
 
-![Diagnostic Setting](assets/Screenshot 2025-09-06 at 2.02.40 PM (2).jpeg)  
-![KQL Log Query](assets/Screenshot 2025-09-06 at 2.31.10 PM.png)
-
----
-
-### 4. Deploy Key Vault
-- Created **DID-Key-Vault-KV**.
-- Applied **Azure RBAC** for access.
-- Configured diagnostic logging to LAW.
-
-![Key Vault Deployment](assets/Screenshot 2025-09-06 at 8.07.59 AM (2).jpeg)  
-![Key Vault RBAC](assets/Screenshot 2025-09-06 at 8.22.57 AM (2).jpeg)  
-![Key Vault Diagnostic Settings](assets/Screenshot 2025-09-06 at 4.32.34 PM (2).jpeg)
+📷 *Key Vault access configuration page*  
+![Key Vault Config](<link-to-keyvault-access-config-screenshot>)  
+📸 *File: Screenshot 2025-09-06 at 8.20.25 AM.png*
 
 ---
 
-### 5. Enable Entra ID Authentication
-- Configured **Entra ID login** for App Service.
-- Verified redirect and token-based access.
+### 4. Monitoring / Detection
+- Connected the Web App and Key Vault diagnostic logs to my **Log Analytics Workspace (LAW)**.  
+- Integrated **Azure Sentinel** to centralize monitoring and generate incidents.  
+- Built detection rules to alert on:
+  - Repeated failed web requests  
+  - Excessive failed Entra ID sign-ins  
+  - Unauthorized Key Vault access attempts  
 
-![Entra Permissions Prompt](assets/Screenshot 2025-09-06 at 1.54.21 PM (2).jpeg)
+📷 *Sentinel Logs showing suspicious requests*  
+![Sentinel Logs](<link-to-sentinel-logs-screenshot>)  
+📸 *File: Screenshot 2025-09-06 at 4.24.35 PM (2).jpeg*
 
----
-
-### 6. Log Analytics & Sentinel Integration
-- Connected **App Service + Key Vault + Entra ID logs** to LAW.
-- Enabled **Sentinel detections** for failed logins and suspicious access.
-
-![LAW Overview](assets/Screenshot 2025-09-06 at 1.59.26 PM (2).jpeg)  
-![Sentinel Workspace](assets/Screenshot 2025-09-06 at 1.21.29 PM (2).jpeg)  
-![Sentinel Query](assets/Screenshot 2025-09-06 at 4.20.40 PM (2).jpeg)  
-![Sentinel Rule](assets/Screenshot 2025-09-06 at 4.24.35 PM (2).jpeg)  
-![Entra Logs Connector](assets/Screenshot 2025-09-06 at 4.54.43 PM (2).jpeg)
+📷 *Log Analytics Workspace overview*  
+![LAW Overview](<link-to-law-overview-screenshot>)  
+📸 *File: Screenshot 2025-09-06 at 1.57.17 PM.jpeg*
 
 ---
 
-## 📊 Example KQL Queries
-
-### Failed Logins (401, 404)
-```kusto
-AppServiceHTTPLogs
-| where ScStatus in (401,404)
-| summarize Count=count() by bin(TimeGenerated, 10m)
-```
-
-### Blocked IPs
-```kusto
-AppServiceHTTPLogs
-| where ScStatus == 403
-| summarize Blocked=count() by ClientIP, bin(TimeGenerated, 10m)
-```
-
-### Key Vault Access
-```kusto
-AzureDiagnostics
-| where ResourceType == "VAULTS"
-| where OperationName == "SecretGet"
-| summarize Accesses=count() by CallerIPAddress, Caller, bin(TimeGenerated, 1h)
-```
+## 🔹 Lab Highlights
+- ✅ **Defense in Depth applied:** Identity, Perimeter, Data, and Monitoring layers.  
+- ✅ **Real-world detections:** Access restriction bypass attempts, failed logins, and secret access monitoring.  
+- ✅ **Azure native tools:** App Service, Entra ID, Key Vault, Log Analytics, Sentinel.  
+- ✅ **Actionable alerts:** Automatic Sentinel incidents tied to suspicious activity.  
 
 ---
 
-## 🛡️ Defense in Depth Achievements
-- **Network Security** → IP restrictions + private endpoints.
-- **Identity Security** → Entra ID authentication + audit logs.
-- **Application Security** → Web App behind Front Door + WAF.
-- **Secrets Management** → Key Vault with RBAC + monitoring.
-- **Monitoring & Detection** → Sentinel queries, rules, dashboards.
-
----
-
-## 📌 Next Improvements
-- Complete **Front Door WAF policy** enforcement.
-- Enable **Defender for App Service & Key Vault**.
-- Build **Sentinel Workbooks** for dashboards.
-- Automate response with **Logic Apps**.
+## 🔹 Resume Bullets (Example)
+- Implemented Azure **Defense-in-Depth lab** with Identity, Perimeter, and Data layers.  
+- Integrated **Microsoft Entra ID** for authentication, **Key Vault** for secret management, and **Sentinel** for threat detection.  
+- Built monitoring rules that raised alerts on **unauthorized access attempts** and **failed logins**.  
 
 ---
 
 ## 📷 Screenshots
-All screenshots are stored in the `/assets/` folder for GitHub compatibility.
+All screenshots are stored in my [Google Drive Defense in Depth folder](<link-to-your-google-drive-folder>).  
+This README embeds the most relevant ones with their file names for reference.
 
+---
+
+## 🔹 Next Steps
+- Add **Azure Front Door with WAF** for advanced perimeter defense.  
+- Expand Sentinel rules with MITRE ATT&CK mapping.  
+- Automate deployments using **Bicep/ARM templates** or **Terraform**.
+
+---
